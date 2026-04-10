@@ -17,6 +17,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
 	"github.com/vektah/gqlparser/v2/ast"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 const defaultPort = "8080"
@@ -26,8 +28,16 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	dsn := os.Getenv("DB_URL")
+	if dsn == "" {
+		dsn = "postgres://root:pass@localhost:5432/todo?sslmode=disable"
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("failed to connect database", err)
+	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(db)}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
