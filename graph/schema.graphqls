@@ -2,16 +2,12 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Status {
-  wipAt: String,
-  completedAt: String,
-}
-
 type Todo {
   # The ID should be an UUIDv7 string to identify
   # the creation time of the todo item.
   id: ID!
-  status: Status!
+  wipAt: String
+  completedAt: String
   text: String!
   user: User!
 }
@@ -21,9 +17,14 @@ type User {
   name: String!
 }
 
+enum Status {
+  WIP
+  COMPLETED
+}
+
 type Query {
   todos: [Todo!]
-  filterBy(wipRange: [String], completedRange: [String]): [Todo!]
+  filterBy(status: Status, wipRange: [String], completedRange: [String]): [Todo!]
 }
 
 input NewTodo {

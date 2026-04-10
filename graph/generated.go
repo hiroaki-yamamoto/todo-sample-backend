@@ -42,20 +42,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FilterBy func(childComplexity int, wipRange []*string, completedRange []*string) int
+		FilterBy func(childComplexity int, status *model.Status, wipRange []*string, completedRange []*string) int
 		Todos    func(childComplexity int) int
 	}
 
-	Status struct {
-		CompletedAt func(childComplexity int) int
-		WipAt       func(childComplexity int) int
-	}
-
 	Todo struct {
-		ID     func(childComplexity int) int
-		Status func(childComplexity int) int
-		Text   func(childComplexity int) int
-		User   func(childComplexity int) int
+		CompletedAt func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Text        func(childComplexity int) int
+		User        func(childComplexity int) int
+		WipAt       func(childComplexity int) int
 	}
 
 	User struct {
@@ -70,7 +66,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*model.Todo, error)
-	FilterBy(ctx context.Context, wipRange []*string, completedRange []*string) ([]*model.Todo, error)
+	FilterBy(ctx context.Context, status *model.Status, wipRange []*string, completedRange []*string) ([]*model.Todo, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -120,7 +116,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.FilterBy(childComplexity, args["wipRange"].([]*string), args["completedRange"].([]*string)), true
+		return e.ComplexityRoot.Query.FilterBy(childComplexity, args["status"].(*model.Status), args["wipRange"].([]*string), args["completedRange"].([]*string)), true
 
 	case "Query.todos":
 		if e.ComplexityRoot.Query.Todos == nil {
@@ -129,31 +125,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Query.Todos(childComplexity), true
 
-	case "Status.completedAt":
-		if e.ComplexityRoot.Status.CompletedAt == nil {
+	case "Todo.completedAt":
+		if e.ComplexityRoot.Todo.CompletedAt == nil {
 			break
 		}
 
-		return e.ComplexityRoot.Status.CompletedAt(childComplexity), true
-	case "Status.wipAt":
-		if e.ComplexityRoot.Status.WipAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Status.WipAt(childComplexity), true
-
+		return e.ComplexityRoot.Todo.CompletedAt(childComplexity), true
 	case "Todo.id":
 		if e.ComplexityRoot.Todo.ID == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Todo.ID(childComplexity), true
-	case "Todo.status":
-		if e.ComplexityRoot.Todo.Status == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Todo.Status(childComplexity), true
 	case "Todo.text":
 		if e.ComplexityRoot.Todo.Text == nil {
 			break
@@ -166,6 +149,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Todo.User(childComplexity), true
+	case "Todo.wipAt":
+		if e.ComplexityRoot.Todo.WipAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Todo.WipAt(childComplexity), true
 
 	case "User.id":
 		if e.ComplexityRoot.User.ID == nil {
@@ -320,16 +309,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_filterBy_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "wipRange", ec.unmarshalOString2ᚕᚖstring)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "status", ec.unmarshalOStatus2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐStatus)
 	if err != nil {
 		return nil, err
 	}
-	args["wipRange"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "completedRange", ec.unmarshalOString2ᚕᚖstring)
+	args["status"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "wipRange", ec.unmarshalOString2ᚕᚖstring)
 	if err != nil {
 		return nil, err
 	}
-	args["completedRange"] = arg1
+	args["wipRange"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "completedRange", ec.unmarshalOString2ᚕᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["completedRange"] = arg2
 	return args, nil
 }
 
@@ -412,8 +406,10 @@ func (ec *executionContext) fieldContext_Mutation_createTodo(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Todo_id(ctx, field)
-			case "status":
-				return ec.fieldContext_Todo_status(ctx, field)
+			case "wipAt":
+				return ec.fieldContext_Todo_wipAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_Todo_completedAt(ctx, field)
 			case "text":
 				return ec.fieldContext_Todo_text(ctx, field)
 			case "user":
@@ -463,8 +459,10 @@ func (ec *executionContext) fieldContext_Mutation_updateTodo(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Todo_id(ctx, field)
-			case "status":
-				return ec.fieldContext_Todo_status(ctx, field)
+			case "wipAt":
+				return ec.fieldContext_Todo_wipAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_Todo_completedAt(ctx, field)
 			case "text":
 				return ec.fieldContext_Todo_text(ctx, field)
 			case "user":
@@ -513,8 +511,10 @@ func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field gr
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Todo_id(ctx, field)
-			case "status":
-				return ec.fieldContext_Todo_status(ctx, field)
+			case "wipAt":
+				return ec.fieldContext_Todo_wipAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_Todo_completedAt(ctx, field)
 			case "text":
 				return ec.fieldContext_Todo_text(ctx, field)
 			case "user":
@@ -534,7 +534,7 @@ func (ec *executionContext) _Query_filterBy(ctx context.Context, field graphql.C
 		ec.fieldContext_Query_filterBy,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().FilterBy(ctx, fc.Args["wipRange"].([]*string), fc.Args["completedRange"].([]*string))
+			return ec.Resolvers.Query().FilterBy(ctx, fc.Args["status"].(*model.Status), fc.Args["wipRange"].([]*string), fc.Args["completedRange"].([]*string))
 		},
 		nil,
 		ec.marshalOTodo2ᚕᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐTodoᚄ,
@@ -553,8 +553,10 @@ func (ec *executionContext) fieldContext_Query_filterBy(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Todo_id(ctx, field)
-			case "status":
-				return ec.fieldContext_Todo_status(ctx, field)
+			case "wipAt":
+				return ec.fieldContext_Todo_wipAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_Todo_completedAt(ctx, field)
 			case "text":
 				return ec.fieldContext_Todo_text(ctx, field)
 			case "user":
@@ -685,64 +687,6 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Status_wipAt(ctx context.Context, field graphql.CollectedField, obj *model.Status) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Status_wipAt,
-		func(ctx context.Context) (any, error) {
-			return obj.WipAt, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Status_wipAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Status",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Status_completedAt(ctx context.Context, field graphql.CollectedField, obj *model.Status) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Status_completedAt,
-		func(ctx context.Context) (any, error) {
-			return obj.CompletedAt, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Status_completedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Status",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Todo_id(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -772,36 +716,59 @@ func (ec *executionContext) fieldContext_Todo_id(_ context.Context, field graphq
 	return fc, nil
 }
 
-func (ec *executionContext) _Todo_status(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Todo_wipAt(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Todo_status,
+		ec.fieldContext_Todo_wipAt,
 		func(ctx context.Context) (any, error) {
-			return obj.Status, nil
+			return obj.WipAt, nil
 		},
 		nil,
-		ec.marshalNStatus2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐStatus,
+		ec.marshalOString2ᚖstring,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Todo_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Todo_wipAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Todo",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "wipAt":
-				return ec.fieldContext_Status_wipAt(ctx, field)
-			case "completedAt":
-				return ec.fieldContext_Status_completedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Status", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Todo_completedAt(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Todo_completedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CompletedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Todo_completedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2615,44 +2582,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var statusImplementors = []string{"Status"}
-
-func (ec *executionContext) _Status(ctx context.Context, sel ast.SelectionSet, obj *model.Status) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, statusImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Status")
-		case "wipAt":
-			out.Values[i] = ec._Status_wipAt(ctx, field, obj)
-		case "completedAt":
-			out.Values[i] = ec._Status_completedAt(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.ProcessDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var todoImplementors = []string{"Todo"}
 
 func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj *model.Todo) graphql.Marshaler {
@@ -2669,11 +2598,10 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "status":
-			out.Values[i] = ec._Todo_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
+		case "wipAt":
+			out.Values[i] = ec._Todo_wipAt(ctx, field, obj)
+		case "completedAt":
+			out.Values[i] = ec._Todo_completedAt(ctx, field, obj)
 		case "text":
 			out.Values[i] = ec._Todo_text(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3123,16 +3051,6 @@ func (ec *executionContext) unmarshalNNewTodo2githubᚗcomᚋhiroakiᚑyamamoto�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNStatus2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v *model.Status) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Status(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3347,6 +3265,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOStatus2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐStatus(ctx context.Context, v any) (*model.Status, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Status)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOStatus2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v *model.Status) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v any) ([]*string, error) {

@@ -28,7 +28,7 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 }
 
 // FilterBy is the resolver for the filterBy field.
-func (r *queryResolver) FilterBy(ctx context.Context, wipRange []*string, completedRange []*string) ([]*model.Todo, error) {
+func (r *queryResolver) FilterBy(ctx context.Context, status *model.Status, wipRange []*string, completedRange []*string) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: FilterBy - filterBy"))
 }
 
