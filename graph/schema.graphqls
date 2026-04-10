@@ -17,11 +17,6 @@ type User {
   name: String!
 }
 
-enum Status {
-  WIP
-  COMPLETED
-}
-
 type Query {
   todos: [Todo!]
 }
