@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
+
+	graph "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 )
 
 type Todo struct {
@@ -23,5 +25,24 @@ func New(text string, user user.User) Todo {
 		WipAt:       nil,
 		CompletedAt: nil,
 		User:        user,
+	}
+}
+
+func (me *Todo) ToGraphQL() *graph.Todo {
+	var wipAt, completedAt *string
+	if me.WipAt != nil {
+		w := me.WipAt.Format(time.RFC3339)
+		wipAt = &w
+	}
+	if me.CompletedAt != nil {
+		c := me.CompletedAt.Format(time.RFC3339)
+		completedAt = &c
+	}
+	return &graph.Todo{
+		ID:          *me.Id,
+		Text:        me.Text,
+		WipAt:       wipAt,
+		CompletedAt: completedAt,
+		User:        me.User.ToGraphQL(),
 	}
 }

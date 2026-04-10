@@ -1,6 +1,10 @@
 package user
 
-import "golang.org/x/crypto/argon2"
+import (
+	"golang.org/x/crypto/argon2"
+
+	graph "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
+)
 
 type User struct {
 	Id   *string
@@ -16,5 +20,13 @@ func New(name string, password string) User {
 		Id:   nil,
 		Name: name,
 		Hash: hash,
+	}
+}
+
+// ToGraphQL converts the User instance to a GraphQL User model.
+func (me *User) ToGraphQL() *graph.User {
+	return &graph.User{
+		ID:   *me.Id,
+		Name: me.Name,
 	}
 }
