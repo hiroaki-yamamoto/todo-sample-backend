@@ -24,7 +24,6 @@ enum Status {
 
 type Query {
   todos: [Todo!]
-  filterBy(status: Status, wipRange: [String], completedRange: [String]): [Todo!]
 }
 
 input NewTodo {
