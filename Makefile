@@ -2,8 +2,8 @@ migrate: setup
 	./db_migrate.sh up
 createMigration:
 	migrate create -ext sql -dir db/migrations -seq $(filter-out $@,$(MAKECMDGOALS))
-gorm:
-	gorm gen -i ./db/models -o ./db/repos
+# gorm:
+# 	gorm gen -i ./db/models -o ./db/repos
 updateGql:
 	go tool gqlgen generate --verbose
 setup:

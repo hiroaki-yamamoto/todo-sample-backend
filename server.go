@@ -16,7 +16,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
-	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
 	"github.com/vektah/gqlparser/v2/ast"
 	"gorm.io/driver/postgres"
@@ -45,11 +44,11 @@ func main() {
 		ctx := context.Background()
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		usr, err = repos.Query[user.User](db).First(ctx)
+		err := db.WithContext(ctx).First(&usr).Error
 		if err != nil {
 			log.Printf("failed to find user, creating a new one: %v", err)
 			usr = user.New("Joh Doe", "password")
-			err = repos.Query[user.User](db).Create(ctx, &usr)
+			err = db.WithContext(ctx).Create(&usr).Error
 			if err != nil {
 				log.Fatal("failed to create user", err)
 			}
