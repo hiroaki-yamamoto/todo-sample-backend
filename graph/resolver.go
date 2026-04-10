@@ -2,7 +2,7 @@ package graph
 
 import (
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
-	"gorm.io/gorm"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/todo"
 )
 
 // This file will not be regenerated automatically.
@@ -11,10 +11,10 @@ import (
 // here.
 
 type Resolver struct {
-	DB   *gorm.DB
-	user user.User
+	todoRepo todo.ITodoRepo
+	user     user.User
 }
 
-func NewResolver(db *gorm.DB, usr user.User) *Resolver {
-	return &Resolver{DB: db, user: usr}
+func NewResolver(usr user.User, todoRepo todo.ITodoRepo) *Resolver {
+	return &Resolver{todoRepo: todoRepo, user: usr}
 }

@@ -7,64 +7,23 @@ package graph
 
 import (
 	"context"
-	"time"
 
-	dbtodo "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	t := dbtodo.New(input.Text, r.user)
-	if err := r.DB.WithContext(ctx).Create(&t).Error; err != nil {
-		return nil, err
-	}
-	return t.ToGraphQL(), nil
+	return r.todoRepo.Create(ctx, input)
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
-	var t dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").First(&t, "id = ?", input.ID).Error; err != nil {
-		return nil, err
-	}
-	t.Text = input.Text
-	if input.WipAt != nil {
-		w, err := time.Parse(time.RFC3339, *input.WipAt)
-		if err == nil {
-			t.WipAt = &w
-		}
-	} else {
-		t.WipAt = nil
-	}
-	if input.CompletedAt != nil {
-		c, err := time.Parse(time.RFC3339, *input.CompletedAt)
-		if err == nil {
-			t.CompletedAt = &c
-		}
-	} else {
-		t.CompletedAt = nil
-	}
-	if err := r.DB.WithContext(ctx).Save(&t).Error; err != nil {
-		return nil, err
-	}
-
-	return t.ToGraphQL(), nil
+	return r.todoRepo.Update(ctx, input)
 }
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	var todos []dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").Find(&todos).Error; err != nil {
-		return nil, err
-	}
-
-	var result []*model.Todo
-	for _, t := range todos {
-		t := t // capture range variable
-		result = append(result, t.ToGraphQL())
-	}
-	return result, nil
+	return r.todoRepo.List(ctx)
 }
 
 // Mutation returns MutationResolver implementation.

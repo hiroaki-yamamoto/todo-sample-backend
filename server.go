@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
 	"github.com/vektah/gqlparser/v2/ast"
 	"gorm.io/driver/postgres"
@@ -55,7 +56,8 @@ func main() {
 		}
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(db, usr)}))
+	todoRepo := todo.NewRepo(db)
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(usr, todoRepo)}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
