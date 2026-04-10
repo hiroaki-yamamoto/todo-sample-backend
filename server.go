@@ -15,6 +15,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
 	"github.com/vektah/gqlparser/v2/ast"
 	"gorm.io/driver/postgres"
@@ -37,7 +39,24 @@ func main() {
 		log.Fatal("failed to connect database", err)
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(db)}))
+	// !!Remove this block when we implement authentication system.
+	var usr user.User
+	{
+		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+		usr, err = repos.Query[user.User](db).First(ctx)
+		if err != nil {
+			log.Printf("failed to find user, creating a new one: %v", err)
+			usr = user.New("Joh Doe", "password")
+			err = repos.Query[user.User](db).Create(ctx, &usr)
+			if err != nil {
+				log.Fatal("failed to create user", err)
+			}
+		}
+	}
+
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(db, usr)}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
