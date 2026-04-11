@@ -2,19 +2,11 @@
 
 package model
 
-import (
-	"bytes"
-	"fmt"
-	"io"
-	"strconv"
-)
-
 type Mutation struct {
 }
 
 type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	Text string `json:"text"`
 }
 
 type Query struct {
@@ -38,59 +30,4 @@ type UpdateTodo struct {
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
-}
-
-type Status string
-
-const (
-	StatusWip       Status = "WIP"
-	StatusCompleted Status = "COMPLETED"
-)
-
-var AllStatus = []Status{
-	StatusWip,
-	StatusCompleted,
-}
-
-func (e Status) IsValid() bool {
-	switch e {
-	case StatusWip, StatusCompleted:
-		return true
-	}
-	return false
-}
-
-func (e Status) String() string {
-	return string(e)
-}
-
-func (e *Status) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = Status(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Status", str)
-	}
-	return nil
-}
-
-func (e Status) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-func (e *Status) UnmarshalJSON(b []byte) error {
-	s, err := strconv.Unquote(string(b))
-	if err != nil {
-		return err
-	}
-	return e.UnmarshalGQL(s)
-}
-
-func (e Status) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	e.MarshalGQL(&buf)
-	return buf.Bytes(), nil
 }

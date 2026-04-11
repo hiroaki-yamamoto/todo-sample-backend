@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	user "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	model "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -81,18 +82,18 @@ func (m *MockICreate) EXPECT() *MockICreateMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockICreate) Create(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (m *MockICreate) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, input)
+	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
 	ret0, _ := ret[0].(*model.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockICreateMockRecorder) Create(ctx, input any) *gomock.Call {
+func (mr *MockICreateMockRecorder) Create(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockICreate)(nil).Create), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockICreate)(nil).Create), ctx, arg1, input)
 }
 
 // MockIUpdate is a mock of IUpdate interface.
@@ -159,18 +160,18 @@ func (m *MockITodoRepo) EXPECT() *MockITodoRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockITodoRepo) Create(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (m *MockITodoRepo) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, input)
+	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
 	ret0, _ := ret[0].(*model.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockITodoRepoMockRecorder) Create(ctx, input any) *gomock.Call {
+func (mr *MockITodoRepoMockRecorder) Create(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockITodoRepo)(nil).Create), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockITodoRepo)(nil).Create), ctx, arg1, input)
 }
 
 // List mocks base method.

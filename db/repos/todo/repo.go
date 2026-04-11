@@ -32,12 +32,8 @@ func (r *TodoRepo) List(ctx context.Context) ([]*gqlModel.Todo, error) {
 	return result, nil
 }
 
-func (r *TodoRepo) Create(ctx context.Context, input gqlModel.NewTodo) (*gqlModel.Todo, error) {
-	var u user.User
-	if err := r.DB.WithContext(ctx).First(&u, "id = ?", input.UserID).Error; err != nil {
-		return nil, err
-	}
-	t := dbtodo.New(input.Text, u)
+func (r *TodoRepo) Create(ctx context.Context, user user.User, input gqlModel.NewTodo) (*gqlModel.Todo, error) {
+	t := dbtodo.New(input.Text, user)
 	if err := r.DB.WithContext(ctx).Create(&t).Error; err != nil {
 		return nil, err
 	}

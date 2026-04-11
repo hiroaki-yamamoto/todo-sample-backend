@@ -20,12 +20,14 @@ var _ = Describe("Schema.Resolvers", func() {
 		mockRepo *todo.MockITodoRepo
 		resolver *graph.Resolver
 		ctx      context.Context
+		usr      user.User
 	)
 
 	BeforeEach(func() {
+		usr = user.New("testuser", "password")
 		ctrl = gomock.NewController(GinkgoT())
 		mockRepo = todo.NewMockITodoRepo(ctrl)
-		resolver = graph.NewResolver(user.User{}, mockRepo)
+		resolver = graph.NewResolver(usr, mockRepo)
 		ctx = context.Background()
 	})
 
@@ -42,10 +44,10 @@ var _ = Describe("Schema.Resolvers", func() {
 
 		Describe("CreateTodo", func() {
 			It("returns the created todo", func() {
-				input := model.NewTodo{Text: "Test Todo", UserID: "user123"}
+				input := model.NewTodo{Text: "Test Todo"}
 				expectedTodo := &model.Todo{ID: "todo123", Text: "Test Todo"}
 
-				mockRepo.EXPECT().Create(ctx, input).Return(expectedTodo, nil)
+				mockRepo.EXPECT().Create(ctx, usr, input).Return(expectedTodo, nil)
 
 				res, err := mutResolver.CreateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -53,10 +55,10 @@ var _ = Describe("Schema.Resolvers", func() {
 			})
 
 			It("returns error when repo fails", func() {
-				input := model.NewTodo{Text: "Test Todo", UserID: "user123"}
+				input := model.NewTodo{Text: "Test Todo"}
 				expectedErr := errors.New("creation failed")
 
-				mockRepo.EXPECT().Create(ctx, input).Return(nil, expectedErr)
+				mockRepo.EXPECT().Create(ctx, usr, input).Return(nil, expectedErr)
 
 				res, err := mutResolver.CreateTodo(ctx, input)
 				Expect(err).To(MatchError(expectedErr))

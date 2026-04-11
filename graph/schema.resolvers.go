@@ -13,7 +13,7 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	return r.todoRepo.Create(ctx, input)
+	return r.todoRepo.Create(ctx, r.Resolver.user, input)
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
@@ -34,15 +34,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) FilterBy(ctx context.Context, status *model.Status, wipRange []*string, completedRange []*string) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: FilterBy - filterBy"))
-}
-*/

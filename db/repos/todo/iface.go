@@ -3,6 +3,7 @@ package todo
 import (
 	"context"
 
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	gqlModel "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 )
 
@@ -11,7 +12,7 @@ type IList interface {
 }
 
 type ICreate interface {
-	Create(ctx context.Context, input gqlModel.NewTodo) (*gqlModel.Todo, error)
+	Create(ctx context.Context, user user.User, input gqlModel.NewTodo) (*gqlModel.Todo, error)
 }
 
 type IUpdate interface {

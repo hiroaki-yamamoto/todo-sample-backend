@@ -48,10 +48,9 @@ var _ = Describe("Repo", func() {
 
 		It("should create a new todo", func() {
 			input := gqlModel.NewTodo{
-				Text:   "My new task",
-				UserID: *u.Id,
+				Text: "My new task",
 			}
-			result, err := repo.Create(ctx, input)
+			result, err := repo.Create(ctx, u, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).NotTo(BeNil())
 			Expect(result.Text).To(Equal("My new task"))
@@ -67,10 +66,11 @@ var _ = Describe("Repo", func() {
 
 		It("should return an error if user does not exist", func() {
 			input := gqlModel.NewTodo{
-				Text:   "My new task",
-				UserID: "00000000-0000-0000-0000-000000000000",
+				Text: "My new task",
 			}
-			_, err := repo.Create(ctx, input)
+			ghost_uid := "00000000-0000-0000-0000-000000000000"
+			user := user.User{Id: &ghost_uid, Name: "ghost", Hash: nil}
+			_, err := repo.Create(ctx, user, input)
 			Expect(err).To(HaveOccurred())
 		})
 	})
