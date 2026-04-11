@@ -1,5 +1,10 @@
 # Todo Sample
 
+[![TestImg]][TestLink]
+
+[TestImg]: https://github.com/hiroaki-yamamoto/todo-sample-backend/actions/workflows/test.yml/badge.svg
+[TestLink]: https://github.com/hiroaki-yamamoto/todo-sample-backend/actions/workflows/test.yml
+
 # Dependencies
 
 - Go 1.20+
