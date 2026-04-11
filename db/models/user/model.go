@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id   *string
+	Id   *string `gorm:"default:uuidv7()"`
 	Name string
 	Hash []byte
 }

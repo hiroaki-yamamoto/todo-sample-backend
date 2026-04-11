@@ -32,7 +32,7 @@ func main() {
 	}
 	dsn := os.Getenv("DB_URL")
 	if dsn == "" {
-		dsn = "postgres://root:pass@localhost:5432/todo?sslmode=disable"
+		dsn = "postgres://postgres:password@localhost:5432/todo?sslmode=disable"
 	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
