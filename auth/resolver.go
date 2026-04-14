@@ -6,9 +6,12 @@ import (
 	"context"
 
 	"github.com/hiroaki-yamamoto/todo-sample-backend/auth/model"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/user"
 )
 
-type Resolver struct{}
+type Resolver struct {
+	UserRepo user.IUserRepo
+}
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.AuthInput) (*model.User, error) {
