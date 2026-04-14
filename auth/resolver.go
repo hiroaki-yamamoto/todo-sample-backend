@@ -11,7 +11,12 @@ import (
 type Resolver struct{}
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.User, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.AuthInput) (*model.User, error) {
+	panic("not implemented")
+}
+
+// CrateUser is the resolver for the crateUser field.
+func (r *mutationResolver) CrateUser(ctx context.Context, input model.AuthInput) (*model.User, error) {
 	panic("not implemented")
 }
 

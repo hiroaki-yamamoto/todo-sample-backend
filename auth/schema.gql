@@ -3,13 +3,14 @@ type User {
   name: String!
 }
 
-input Login {
+input AuthInput {
   name: String!
   password: String!
 }
 
 type Mutation {
-  login(input: Login!): User!
+  login(input: AuthInput!): User!
+  crateUser(input: AuthInput!): User!
 }
 
 type Query {

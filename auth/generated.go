@@ -37,7 +37,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		Login func(childComplexity int, input model.Login) int
+		CrateUser func(childComplexity int, input model.AuthInput) int
+		Login     func(childComplexity int, input model.AuthInput) int
 	}
 
 	Query struct {
@@ -51,7 +52,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	Login(ctx context.Context, input model.Login) (*model.User, error)
+	Login(ctx context.Context, input model.AuthInput) (*model.User, error)
+	CrateUser(ctx context.Context, input model.AuthInput) (*model.User, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
@@ -71,6 +73,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.crateUser":
+		if e.ComplexityRoot.Mutation.CrateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_crateUser_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CrateUser(childComplexity, args["input"].(model.AuthInput)), true
 	case "Mutation.login":
 		if e.ComplexityRoot.Mutation.Login == nil {
 			break
@@ -81,7 +94,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.Login(childComplexity, args["input"].(model.Login)), true
+		return e.ComplexityRoot.Mutation.Login(childComplexity, args["input"].(model.AuthInput)), true
 
 	case "Query.me":
 		if e.ComplexityRoot.Query.Me == nil {
@@ -111,7 +124,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := newExecutionContext(opCtx, e, make(chan graphql.DeferredResult))
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputLogin,
+		ec.unmarshalInputAuthInput,
 	)
 	first := true
 
@@ -206,10 +219,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_crateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNAuthInput2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐAuthInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNLogin2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐLogin)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNAuthInput2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐAuthInput)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +312,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 		ec.fieldContext_Mutation_login,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().Login(ctx, fc.Args["input"].(model.Login))
+			return ec.Resolvers.Mutation().Login(ctx, fc.Args["input"].(model.AuthInput))
 		},
 		nil,
 		ec.marshalNUser2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐUser,
@@ -321,6 +345,53 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_crateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_crateUser,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CrateUser(ctx, fc.Args["input"].(model.AuthInput))
+		},
+		nil,
+		ec.marshalNUser2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_crateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_crateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1974,8 +2045,8 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj any) (model.Login, error) {
-	var it model.Login
+func (ec *executionContext) unmarshalInputAuthInput(ctx context.Context, obj any) (model.AuthInput, error) {
+	var it model.AuthInput
 	if obj == nil {
 		return it, nil
 	}
@@ -2041,6 +2112,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "login":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_login(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "crateUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_crateUser(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -2516,6 +2594,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAuthInput2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐAuthInput(ctx context.Context, v any) (model.AuthInput, error) {
+	res, err := ec.unmarshalInputAuthInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2546,11 +2629,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐLogin(ctx context.Context, v any) (model.Login, error) {
-	res, err := ec.unmarshalInputLogin(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

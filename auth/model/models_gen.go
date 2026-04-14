@@ -2,7 +2,7 @@
 
 package model
 
-type Login struct {
+type AuthInput struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
