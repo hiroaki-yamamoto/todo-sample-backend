@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: "stable"
-          cache-dependency-path: backend/go.sum
+          cache-dependency-path: go.sum
 
       - name: Install golang-migrate
         run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
