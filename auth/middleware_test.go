@@ -1,22 +1,22 @@
 package auth_test
 
 import (
-"context"
-"net/http"
-"net/http/httptest"
+	"context"
+	"net/http"
+	"net/http/httptest"
 
-. "github.com/onsi/ginkgo/v2"
-. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
-"github.com/hiroaki-yamamoto/todo-sample-backend/auth"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/auth"
 )
 
 var _ = Describe("Middleware", func() {
 	It("injects response writer", func() {
 		called := false
 		handler := auth.InjectResponseWriter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-called = true
-gotW := auth.GetResponseWriter(r.Context())
+			called = true
+			gotW := auth.GetResponseWriter(r.Context())
 			Expect(gotW).To(Equal(w))
 		}))
 
