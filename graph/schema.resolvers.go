@@ -7,23 +7,69 @@ package graph
 
 import (
 	"context"
+	"errors"
 
+	gauthMw "github.com/hiroaki-yamamoto/gauth/middleware"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	return r.todoRepo.Create(ctx, r.Resolver.user, input)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todo, err := r.todoRepo.Create(ctx, *u, input)
+	if err != nil {
+		return nil, err
+	}
+	return todo.ToGraphQL(), nil
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
-	return r.todoRepo.Update(ctx, input)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todo, err := r.todoRepo.Update(ctx, *u, input)
+	if err != nil {
+		return nil, err
+	}
+	return todo.ToGraphQL(), nil
 }
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todoRepo.List(ctx)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todos, err := r.todoRepo.List(ctx, *u)
+	if err != nil {
+		return nil, err
+	}
+	var gqlTodos []*model.Todo
+	for _, t := range todos {
+		gqlTodos = append(gqlTodos, t.ToGraphQL())
+	}
+	return gqlTodos, nil
 }
 
 // Mutation returns MutationResolver implementation.

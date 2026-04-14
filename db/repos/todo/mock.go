@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	todo "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/todo"
 	user "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	model "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 	gomock "go.uber.org/mock/gomock"
@@ -43,18 +44,18 @@ func (m *MockIList) EXPECT() *MockIListMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockIList) List(ctx context.Context) ([]*model.Todo, error) {
+func (m *MockIList) List(ctx context.Context, arg1 user.User) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx)
-	ret0, _ := ret[0].([]*model.Todo)
+	ret := m.ctrl.Call(m, "List", ctx, arg1)
+	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockIListMockRecorder) List(ctx any) *gomock.Call {
+func (mr *MockIListMockRecorder) List(ctx, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIList)(nil).List), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIList)(nil).List), ctx, arg1)
 }
 
 // MockICreate is a mock of ICreate interface.
@@ -82,10 +83,10 @@ func (m *MockICreate) EXPECT() *MockICreateMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockICreate) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
+func (m *MockICreate) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -121,18 +122,18 @@ func (m *MockIUpdate) EXPECT() *MockIUpdateMockRecorder {
 }
 
 // Update mocks base method.
-func (m *MockIUpdate) Update(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
+func (m *MockIUpdate) Update(ctx context.Context, arg1 user.User, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret := m.ctrl.Call(m, "Update", ctx, arg1, input)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIUpdateMockRecorder) Update(ctx, input any) *gomock.Call {
+func (mr *MockIUpdateMockRecorder) Update(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIUpdate)(nil).Update), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIUpdate)(nil).Update), ctx, arg1, input)
 }
 
 // MockITodoRepo is a mock of ITodoRepo interface.
@@ -160,10 +161,10 @@ func (m *MockITodoRepo) EXPECT() *MockITodoRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockITodoRepo) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
+func (m *MockITodoRepo) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -175,31 +176,31 @@ func (mr *MockITodoRepoMockRecorder) Create(ctx, arg1, input any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockITodoRepo) List(ctx context.Context) ([]*model.Todo, error) {
+func (m *MockITodoRepo) List(ctx context.Context, arg1 user.User) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx)
-	ret0, _ := ret[0].([]*model.Todo)
+	ret := m.ctrl.Call(m, "List", ctx, arg1)
+	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockITodoRepoMockRecorder) List(ctx any) *gomock.Call {
+func (mr *MockITodoRepoMockRecorder) List(ctx, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockITodoRepo)(nil).List), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockITodoRepo)(nil).List), ctx, arg1)
 }
 
 // Update mocks base method.
-func (m *MockITodoRepo) Update(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
+func (m *MockITodoRepo) Update(ctx context.Context, arg1 user.User, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret := m.ctrl.Call(m, "Update", ctx, arg1, input)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockITodoRepoMockRecorder) Update(ctx, input any) *gomock.Call {
+func (mr *MockITodoRepoMockRecorder) Update(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockITodoRepo)(nil).Update), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockITodoRepo)(nil).Update), ctx, arg1, input)
 }

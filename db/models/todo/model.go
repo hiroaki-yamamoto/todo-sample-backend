@@ -40,11 +40,16 @@ func (me *Todo) ToGraphQL() *graph.Todo {
 		c := me.CompletedAt.Format(time.RFC3339)
 		completedAt = &c
 	}
+
+	var id string
+	if me.Id != nil {
+		id = *me.Id
+	}
+
 	return &graph.Todo{
-		ID:          *me.Id,
+		ID:          id,
 		Text:        me.Text,
 		WipAt:       wipAt,
 		CompletedAt: completedAt,
-		User:        me.User.ToGraphQL(),
 	}
 }

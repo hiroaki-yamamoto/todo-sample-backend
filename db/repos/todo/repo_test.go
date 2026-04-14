@@ -22,7 +22,7 @@ var _ = Describe("Repo", func() {
 	var ctx context.Context
 
 	BeforeEach(func() {
-		dsn := "host=localhost user=postgres password=password dbname=test port=5432 sslmode=disable"
+		dsn := "host=localhost user=postgres password=password dbname=todo_test port=5432 sslmode=disable"
 		var err error
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		Expect(err).NotTo(HaveOccurred())
@@ -33,7 +33,7 @@ var _ = Describe("Repo", func() {
 
 	AfterEach(func() {
 		// Clean up the todos table after each test
-		err := db.Exec("TRUNCATE TABLE todos, users RESTART IDENTITY CASCADE").Error
+		err := db.Exec("TRUNCATE TABLE todos, users CASCADE").Error
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -42,7 +42,7 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -54,7 +54,7 @@ var _ = Describe("Repo", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).NotTo(BeNil())
 			Expect(result.Text).To(Equal("My new task"))
-			Expect(result.User.ID).To(Equal(*u.Id))
+			Expect(*result.UserId).To(Equal(*u.Id))
 			Expect(result.WipAt).To(BeNil())
 			Expect(result.CompletedAt).To(BeNil())
 
@@ -80,26 +80,26 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser2", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 
 			t1 := dbtodo.New("Task 1", u)
 			t2 := dbtodo.New("Task 2", u)
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t1.Text, u.Id).Scan(&t1.Id).Error
+			err = db.Create(&t1).Error
 			Expect(err).NotTo(HaveOccurred())
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t2.Text, u.Id).Scan(&t2.Id).Error
+			err = db.Create(&t2).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should return all todos with user preloaded", func() {
-			results, err := repo.List(ctx)
+			results, err := repo.List(ctx, u)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(HaveLen(2))
 			// Order may vary slightly depending on primary key, so we check existence
 			texts := []string{results[0].Text, results[1].Text}
 			Expect(texts).To(ContainElement("Task 1"))
 			Expect(texts).To(ContainElement("Task 2"))
-			Expect(results[0].User.ID).To(Equal(*u.Id))
+			Expect(*results[0].UserId).To(Equal(*u.Id))
 		})
 	})
 
@@ -109,11 +109,11 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser3", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 
 			t = dbtodo.New("Update Task", u)
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t.Text, u.Id).Scan(&t.Id).Error
+			err = db.Create(&t).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -122,7 +122,7 @@ var _ = Describe("Repo", func() {
 				ID:   *t.Id,
 				Text: "Updated Task",
 			}
-			result, err := repo.Update(ctx, input)
+			result, err := repo.Update(ctx, u, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).NotTo(BeNil())
 			Expect(result.Text).To(Equal("Updated Task"))
@@ -144,11 +144,11 @@ var _ = Describe("Repo", func() {
 				WipAt:       &wipStr,
 				CompletedAt: &compStr,
 			}
-			result, err := repo.Update(ctx, input)
+			result, err := repo.Update(ctx, u, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Text).To(Equal("Status Updated"))
-			Expect(*result.WipAt).To(Equal(wipStr))
-			Expect(*result.CompletedAt).To(Equal(compStr))
+			Expect((*result.WipAt).Unix()).To(Equal(wipTime.Unix()))
+			Expect((*result.CompletedAt).Unix()).To(Equal(completedTime.Unix()))
 
 			var dbTodo dbtodo.Todo
 			db.First(&dbTodo, "id = ?", *t.Id)
@@ -161,7 +161,7 @@ var _ = Describe("Repo", func() {
 				ID:   "00000000-0000-0000-0000-000000000000",
 				Text: "Ghost Task",
 			}
-			_, err := repo.Update(ctx, input)
+			_, err := repo.Update(ctx, u, input)
 			Expect(err).To(HaveOccurred())
 		})
 	})

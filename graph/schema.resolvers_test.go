@@ -3,11 +3,16 @@ package graph_test
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+
+	gauthMw "github.com/hiroaki-yamamoto/gauth/middleware"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/mock/gomock"
 
+	dbtodo "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
@@ -27,8 +32,9 @@ var _ = Describe("Schema.Resolvers", func() {
 		usr = user.New("testuser", "password")
 		ctrl = gomock.NewController(GinkgoT())
 		mockRepo = todo.NewMockITodoRepo(ctrl)
-		resolver = graph.NewResolver(usr, mockRepo)
-		ctx = context.Background()
+		resolver = graph.NewResolver(mockRepo)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		ctx = gauthMw.SetUser(req, &usr).Context()
 	})
 
 	AfterEach(func() {
@@ -45,9 +51,11 @@ var _ = Describe("Schema.Resolvers", func() {
 		Describe("CreateTodo", func() {
 			It("returns the created todo", func() {
 				input := model.NewTodo{Text: "Test Todo"}
-				expectedTodo := &model.Todo{ID: "todo123", Text: "Test Todo"}
+				id := "todo123"
+				expectedDbTodo := &dbtodo.Todo{Id: &id, Text: "Test Todo"}
+				expectedTodo := expectedDbTodo.ToGraphQL()
 
-				mockRepo.EXPECT().Create(ctx, usr, input).Return(expectedTodo, nil)
+				mockRepo.EXPECT().Create(ctx, usr, input).Return(expectedDbTodo, nil)
 
 				res, err := mutResolver.CreateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -69,9 +77,11 @@ var _ = Describe("Schema.Resolvers", func() {
 		Describe("UpdateTodo", func() {
 			It("returns the updated todo", func() {
 				input := model.UpdateTodo{ID: "todo123"}
-				expectedTodo := &model.Todo{ID: "todo123"}
+				id := "todo123"
+				expectedDbTodo := &dbtodo.Todo{Id: &id}
+				expectedTodo := expectedDbTodo.ToGraphQL()
 
-				mockRepo.EXPECT().Update(ctx, input).Return(expectedTodo, nil)
+				mockRepo.EXPECT().Update(ctx, usr, input).Return(expectedDbTodo, nil)
 
 				res, err := mutResolver.UpdateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -82,7 +92,7 @@ var _ = Describe("Schema.Resolvers", func() {
 				input := model.UpdateTodo{ID: "todo123"}
 				expectedErr := errors.New("update failed")
 
-				mockRepo.EXPECT().Update(ctx, input).Return(nil, expectedErr)
+				mockRepo.EXPECT().Update(ctx, usr, input).Return(nil, expectedErr)
 
 				res, err := mutResolver.UpdateTodo(ctx, input)
 				Expect(err).To(MatchError(expectedErr))
@@ -100,12 +110,18 @@ var _ = Describe("Schema.Resolvers", func() {
 
 		Describe("Todos", func() {
 			It("returns a list of todos", func() {
+				id1 := "todo1"
+				id2 := "todo2"
+				expectedDbTodos := []dbtodo.Todo{
+					{Id: &id1},
+					{Id: &id2},
+				}
 				expectedTodos := []*model.Todo{
-					{ID: "todo1"},
-					{ID: "todo2"},
+					expectedDbTodos[0].ToGraphQL(),
+					expectedDbTodos[1].ToGraphQL(),
 				}
 
-				mockRepo.EXPECT().List(ctx).Return(expectedTodos, nil)
+				mockRepo.EXPECT().List(ctx, usr).Return(expectedDbTodos, nil)
 
 				res, err := queryResolver.Todos(ctx)
 				Expect(err).NotTo(HaveOccurred())
@@ -115,7 +131,7 @@ var _ = Describe("Schema.Resolvers", func() {
 			It("returns error when repo fails", func() {
 				expectedErr := errors.New("list failed")
 
-				mockRepo.EXPECT().List(ctx).Return(nil, expectedErr)
+				mockRepo.EXPECT().List(ctx, usr).Return(nil, expectedErr)
 
 				res, err := queryResolver.Todos(ctx)
 				Expect(err).To(MatchError(expectedErr))

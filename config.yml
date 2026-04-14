@@ -1,0 +1,5 @@
+port: 8080
+db: postgres://postgres:password@localhost:5432/todo?sslmode=disable
+secret: >-
+  fÈ®ßï±Sµ¶¸Ù´Ø®TöÉ®ªbsLm0ëwØQÞLí¡73¢þÙyï¬M«éö6ö´ÿ¡IB¹¦U¶ÛMñØ5MÎóO2ìT¹xF®bubTxì
+  Yâ¨á¯iÓÎèg³ÞnÜZäÛ5sj«Ü¯è½b÷ÈËãÃ²UÐÑTÈv6OY9fDÚú¸µN·Û

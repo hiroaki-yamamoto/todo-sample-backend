@@ -9,12 +9,6 @@ type Todo {
   wipAt: String
   completedAt: String
   text: String!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
 }
 
 type Query {

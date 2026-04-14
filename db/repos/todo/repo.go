@@ -18,31 +18,29 @@ func NewRepo(db *gorm.DB) *TodoRepo {
 	return &TodoRepo{DB: db}
 }
 
-func (r *TodoRepo) List(ctx context.Context) ([]*gqlModel.Todo, error) {
+func (r *TodoRepo) List(ctx context.Context, user user.User) ([]dbtodo.Todo, error) {
 	var todos []dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").Find(&todos).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Where("user_id = ?", user.Id).Find(&todos).Error; err != nil {
 		return nil, err
 	}
-
-	var result []*gqlModel.Todo
-	for _, t := range todos {
-		t := t // capture range variable
-		result = append(result, t.ToGraphQL())
-	}
-	return result, nil
+	return todos, nil
 }
 
-func (r *TodoRepo) Create(ctx context.Context, user user.User, input gqlModel.NewTodo) (*gqlModel.Todo, error) {
+func (r *TodoRepo) Create(ctx context.Context, user user.User, input gqlModel.NewTodo) (*dbtodo.Todo, error) {
 	t := dbtodo.New(input.Text, user)
 	if err := r.DB.WithContext(ctx).Create(&t).Error; err != nil {
 		return nil, err
 	}
-	return t.ToGraphQL(), nil
+	return &t, nil
 }
 
-func (r *TodoRepo) Update(ctx context.Context, input gqlModel.UpdateTodo) (*gqlModel.Todo, error) {
+func (r *TodoRepo) Update(
+	ctx context.Context,
+	user user.User,
+	input gqlModel.UpdateTodo,
+) (*dbtodo.Todo, error) {
 	var t dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").First(&t, "id = ?", input.ID).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&t, "id = ? AND user_id = ?", input.ID, user.Id).Error; err != nil {
 		return nil, err
 	}
 	t.Text = input.Text
@@ -66,5 +64,5 @@ func (r *TodoRepo) Update(ctx context.Context, input gqlModel.UpdateTodo) (*gqlM
 		return nil, err
 	}
 
-	return t.ToGraphQL(), nil
+	return &t, nil
 }

@@ -17,7 +17,6 @@ type Todo struct {
 	WipAt       *string `json:"wipAt,omitempty"`
 	CompletedAt *string `json:"completedAt,omitempty"`
 	Text        string  `json:"text"`
-	User        *User   `json:"user"`
 }
 
 type UpdateTodo struct {
@@ -25,9 +24,4 @@ type UpdateTodo struct {
 	Text        string  `json:"text"`
 	WipAt       *string `json:"wipAt,omitempty"`
 	CompletedAt *string `json:"completedAt,omitempty"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
 }
