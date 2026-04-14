@@ -1,0 +1,10 @@
+schema:
+  - ./schema.gql
+exec:
+  package: auth
+model:
+  filename: model/models_gen.go
+  package: model
+resolver:
+  package: auth
+  filename: ./resolver.go

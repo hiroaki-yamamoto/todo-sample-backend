@@ -10,7 +10,8 @@ test:
 # gorm:
 # 	gorm gen -i ./db/models -o ./db/repos
 updateGql:
-	go tool gqlgen generate --verbose
+	make -C graph
+	make -C auth
 setup:
 	docker compose up -d --wait --wait-timeout 60
 teardown:
