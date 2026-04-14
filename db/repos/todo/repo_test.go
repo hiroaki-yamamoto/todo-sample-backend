@@ -22,7 +22,7 @@ var _ = Describe("Repo", func() {
 	var ctx context.Context
 
 	BeforeEach(func() {
-		dsn := "host=localhost user=postgres password=password dbname=test port=5432 sslmode=disable"
+		dsn := "host=localhost user=postgres password=password dbname=todo_test port=5432 sslmode=disable"
 		var err error
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		Expect(err).NotTo(HaveOccurred())
@@ -33,7 +33,7 @@ var _ = Describe("Repo", func() {
 
 	AfterEach(func() {
 		// Clean up the todos table after each test
-		err := db.Exec("TRUNCATE TABLE todos, users RESTART IDENTITY CASCADE").Error
+		err := db.Exec("TRUNCATE TABLE todos, users CASCADE").Error
 		Expect(err).NotTo(HaveOccurred())
 	})
 
