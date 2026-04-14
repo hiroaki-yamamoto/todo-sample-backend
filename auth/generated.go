@@ -37,8 +37,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CrateUser func(childComplexity int, input model.AuthInput) int
-		Login     func(childComplexity int, input model.AuthInput) int
+		CreateUser func(childComplexity int, input model.AuthInput) int
+		Login      func(childComplexity int, input model.AuthInput) int
 	}
 
 	Query struct {
@@ -53,7 +53,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Login(ctx context.Context, input model.AuthInput) (*model.User, error)
-	CrateUser(ctx context.Context, input model.AuthInput) (*model.User, error)
+	CreateUser(ctx context.Context, input model.AuthInput) (*model.User, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
@@ -73,17 +73,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.crateUser":
-		if e.ComplexityRoot.Mutation.CrateUser == nil {
+	case "Mutation.createUser":
+		if e.ComplexityRoot.Mutation.CreateUser == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_crateUser_args(ctx, rawArgs)
+		args, err := ec.field_Mutation_createUser_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CrateUser(childComplexity, args["input"].(model.AuthInput)), true
+		return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["input"].(model.AuthInput)), true
 	case "Mutation.login":
 		if e.ComplexityRoot.Mutation.Login == nil {
 			break
@@ -219,7 +219,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_crateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNAuthInput2githubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐAuthInput)
@@ -351,15 +351,15 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_crateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Mutation_crateUser,
+		ec.fieldContext_Mutation_createUser,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CrateUser(ctx, fc.Args["input"].(model.AuthInput))
+			return ec.Resolvers.Mutation().CreateUser(ctx, fc.Args["input"].(model.AuthInput))
 		},
 		nil,
 		ec.marshalNUser2ᚖgithubᚗcomᚋhiroakiᚑyamamotoᚋtodoᚑsampleᚑbackendᚋauthᚋmodelᚐUser,
@@ -368,7 +368,7 @@ func (ec *executionContext) _Mutation_crateUser(ctx context.Context, field graph
 	)
 }
 
-func (ec *executionContext) fieldContext_Mutation_crateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -391,7 +391,7 @@ func (ec *executionContext) fieldContext_Mutation_crateUser(ctx context.Context,
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_crateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2116,9 +2116,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "crateUser":
+		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_crateUser(ctx, field)
+				return ec._Mutation_createUser(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

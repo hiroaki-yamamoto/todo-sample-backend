@@ -4,28 +4,57 @@ package auth
 
 import (
 	"context"
+	"errors"
 
+	"github.com/hiroaki-yamamoto/gauth/config"
+	"github.com/hiroaki-yamamoto/gauth/core"
+	gauthMw "github.com/hiroaki-yamamoto/gauth/middleware"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/auth/model"
-	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/user"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
+	userRepo "github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/user"
 )
 
 type Resolver struct {
-	UserRepo user.IUserRepo
+	UserRepo    userRepo.IUserRepo
+	GAuthConfig *config.Config
 }
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.AuthInput) (*model.User, error) {
-	panic("not implemented")
+	u, err := r.UserRepo.Authenticate(ctx, input.Name, input.Password)
+	if err != nil {
+		return nil, err
+	}
+	w := GetResponseWriter(ctx)
+	if w != nil {
+		err = core.Login(w, r.GAuthConfig, u)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return u.ToGraphQL(), nil
 }
 
-// CrateUser is the resolver for the crateUser field.
-func (r *mutationResolver) CrateUser(ctx context.Context, input model.AuthInput) (*model.User, error) {
-	panic("not implemented")
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.AuthInput) (*model.User, error) {
+	u, err := r.UserRepo.Create(ctx, input.Name, input.Password)
+	if err != nil {
+		return nil, err
+	}
+	return u.ToGraphQL(), nil
 }
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	panic("not implemented")
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+	return u.ToGraphQL(), nil
 }
 
 // Mutation returns MutationResolver implementation.

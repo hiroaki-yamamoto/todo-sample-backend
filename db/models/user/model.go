@@ -25,8 +25,19 @@ func New(name string, password string) User {
 
 // ToGraphQL converts the User instance to a GraphQL User model.
 func (me *User) ToGraphQL() *authModel.User {
+	var id string
+	if me.Id != nil {
+		id = *me.Id
+	}
 	return &authModel.User{
-		ID:   *me.Id,
+		ID:   id,
 		Name: me.Name,
 	}
+}
+
+func (u *User) GetID() string {
+	if u.Id == nil {
+		return ""
+	}
+	return *u.Id
 }

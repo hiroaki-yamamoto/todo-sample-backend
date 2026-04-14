@@ -1,7 +1,6 @@
 package graph
 
 import (
-	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/todo"
 )
 
@@ -12,9 +11,8 @@ import (
 
 type Resolver struct {
 	todoRepo todo.ITodoRepo
-	user     user.User
 }
 
-func NewResolver(usr user.User, todoRepo todo.ITodoRepo) *Resolver {
-	return &Resolver{todoRepo: todoRepo, user: usr}
+func NewResolver(todoRepo todo.ITodoRepo) *Resolver {
+	return &Resolver{todoRepo: todoRepo}
 }

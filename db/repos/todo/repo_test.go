@@ -42,7 +42,7 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -80,14 +80,14 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser2", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 
 			t1 := dbtodo.New("Task 1", u)
 			t2 := dbtodo.New("Task 2", u)
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t1.Text, u.Id).Scan(&t1.Id).Error
+			err = db.Create(&t1).Error
 			Expect(err).NotTo(HaveOccurred())
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t2.Text, u.Id).Scan(&t2.Id).Error
+			err = db.Create(&t2).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -109,11 +109,11 @@ var _ = Describe("Repo", func() {
 
 		BeforeEach(func() {
 			u = user.New("testuser3", "password")
-			err := db.Raw("INSERT INTO users (name, hash) VALUES (?, ?) RETURNING id", u.Name, u.Hash).Scan(&u.Id).Error
+			err := db.Create(&u).Error
 			Expect(err).NotTo(HaveOccurred())
 
 			t = dbtodo.New("Update Task", u)
-			err = db.Raw("INSERT INTO todos (text, user_id) VALUES (?, ?) RETURNING id", t.Text, u.Id).Scan(&t.Id).Error
+			err = db.Create(&t).Error
 			Expect(err).NotTo(HaveOccurred())
 		})
 

@@ -10,7 +10,7 @@ input AuthInput {
 
 type Mutation {
   login(input: AuthInput!): User!
-  crateUser(input: AuthInput!): User!
+  createUser(input: AuthInput!): User!
 }
 
 type Query {

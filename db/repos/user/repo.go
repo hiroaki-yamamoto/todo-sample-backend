@@ -19,12 +19,12 @@ func NewRepo(db *gorm.DB) *UserRepo {
 }
 
 func (r *UserRepo) Create(ctx context.Context, name string, password string) (*user.User, error) {
-	// var existing user.User
-	// if err := r.DB.WithContext(ctx).Where("name = ?", name).First(&existing).Error; err == nil {
-	// 	return nil, errors.New("user already exists")
-	// } else if err != gorm.ErrRecordNotFound {
-	// 	return nil, err
-	// }
+	var existing user.User
+	if err := r.DB.WithContext(ctx).Where("name = ?", name).First(&existing).Error; err == nil {
+		return nil, errors.New("user already exists")
+	} else if err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
 
 	u := user.New(name, password)
 	if err := r.DB.WithContext(ctx).Create(&u).Error; err != nil {

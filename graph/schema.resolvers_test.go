@@ -3,6 +3,10 @@ package graph_test
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+
+	gauthMw "github.com/hiroaki-yamamoto/gauth/middleware"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,8 +32,9 @@ var _ = Describe("Schema.Resolvers", func() {
 		usr = user.New("testuser", "password")
 		ctrl = gomock.NewController(GinkgoT())
 		mockRepo = todo.NewMockITodoRepo(ctrl)
-		resolver = graph.NewResolver(usr, mockRepo)
-		ctx = context.Background()
+		resolver = graph.NewResolver(mockRepo)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		ctx = gauthMw.SetUser(req, &usr).Context()
 	})
 
 	AfterEach(func() {

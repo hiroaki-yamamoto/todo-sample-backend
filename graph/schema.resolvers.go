@@ -7,13 +7,25 @@ package graph
 
 import (
 	"context"
+	"errors"
 
+	gauthMw "github.com/hiroaki-yamamoto/gauth/middleware"
+	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo, err := r.todoRepo.Create(ctx, r.Resolver.user, input)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todo, err := r.todoRepo.Create(ctx, *u, input)
 	if err != nil {
 		return nil, err
 	}
