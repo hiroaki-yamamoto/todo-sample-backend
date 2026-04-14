@@ -18,9 +18,9 @@ func NewRepo(db *gorm.DB) *TodoRepo {
 	return &TodoRepo{DB: db}
 }
 
-func (r *TodoRepo) List(ctx context.Context) ([]dbtodo.Todo, error) {
+func (r *TodoRepo) List(ctx context.Context, user user.User) ([]dbtodo.Todo, error) {
 	var todos []dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").Find(&todos).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Where("user_id = ?", user.Id).Find(&todos).Error; err != nil {
 		return nil, err
 	}
 	return todos, nil

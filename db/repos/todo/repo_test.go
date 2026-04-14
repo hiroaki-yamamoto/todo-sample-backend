@@ -92,7 +92,7 @@ var _ = Describe("Repo", func() {
 		})
 
 		It("should return all todos with user preloaded", func() {
-			results, err := repo.List(ctx)
+			results, err := repo.List(ctx, u)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(HaveLen(2))
 			// Order may vary slightly depending on primary key, so we check existence

@@ -43,7 +43,16 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTod
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	todos, err := r.todoRepo.List(ctx)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todos, err := r.todoRepo.List(ctx, *u)
 	if err != nil {
 		return nil, err
 	}

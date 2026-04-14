@@ -121,7 +121,7 @@ var _ = Describe("Schema.Resolvers", func() {
 					expectedDbTodos[1].ToGraphQL(),
 				}
 
-				mockRepo.EXPECT().List(ctx).Return(expectedDbTodos, nil)
+				mockRepo.EXPECT().List(ctx, usr).Return(expectedDbTodos, nil)
 
 				res, err := queryResolver.Todos(ctx)
 				Expect(err).NotTo(HaveOccurred())
@@ -131,7 +131,7 @@ var _ = Describe("Schema.Resolvers", func() {
 			It("returns error when repo fails", func() {
 				expectedErr := errors.New("list failed")
 
-				mockRepo.EXPECT().List(ctx).Return(nil, expectedErr)
+				mockRepo.EXPECT().List(ctx, usr).Return(nil, expectedErr)
 
 				res, err := queryResolver.Todos(ctx)
 				Expect(err).To(MatchError(expectedErr))

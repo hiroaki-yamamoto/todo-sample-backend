@@ -44,18 +44,18 @@ func (m *MockIList) EXPECT() *MockIListMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockIList) List(ctx context.Context) ([]todo.Todo, error) {
+func (m *MockIList) List(ctx context.Context, arg1 user.User) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx)
+	ret := m.ctrl.Call(m, "List", ctx, arg1)
 	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockIListMockRecorder) List(ctx any) *gomock.Call {
+func (mr *MockIListMockRecorder) List(ctx, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIList)(nil).List), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockIList)(nil).List), ctx, arg1)
 }
 
 // MockICreate is a mock of ICreate interface.
@@ -176,18 +176,18 @@ func (mr *MockITodoRepoMockRecorder) Create(ctx, arg1, input any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockITodoRepo) List(ctx context.Context) ([]todo.Todo, error) {
+func (m *MockITodoRepo) List(ctx context.Context, arg1 user.User) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx)
+	ret := m.ctrl.Call(m, "List", ctx, arg1)
 	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockITodoRepoMockRecorder) List(ctx any) *gomock.Call {
+func (mr *MockITodoRepoMockRecorder) List(ctx, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockITodoRepo)(nil).List), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockITodoRepo)(nil).List), ctx, arg1)
 }
 
 // Update mocks base method.

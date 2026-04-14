@@ -9,7 +9,7 @@ import (
 )
 
 type IList interface {
-	List(ctx context.Context) ([]model.Todo, error)
+	List(ctx context.Context, user user.User) ([]model.Todo, error)
 }
 
 type ICreate interface {
