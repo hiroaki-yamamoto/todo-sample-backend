@@ -3,7 +3,7 @@ package user
 import (
 	"golang.org/x/crypto/argon2"
 
-	graph "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
+	authModel "github.com/hiroaki-yamamoto/todo-sample-backend/auth/model"
 )
 
 type User struct {
@@ -24,8 +24,8 @@ func New(name string, password string) User {
 }
 
 // ToGraphQL converts the User instance to a GraphQL User model.
-func (me *User) ToGraphQL() *graph.User {
-	return &graph.User{
+func (me *User) ToGraphQL() *authModel.User {
+	return &authModel.User{
 		ID:   *me.Id,
 		Name: me.Name,
 	}

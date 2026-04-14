@@ -5,7 +5,7 @@ createMigration:
 		-ext sql \
 		-dir db/migrations \
 		-seq $(filter-out $@,$(MAKECMDGOALS))
-test:
+test: setup
 	go test -v ./...
 # gorm:
 # 	gorm gen -i ./db/models -o ./db/repos

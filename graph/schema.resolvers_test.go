@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/mock/gomock"
 
+	dbtodo "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/db/repos/todo"
 	"github.com/hiroaki-yamamoto/todo-sample-backend/graph"
@@ -45,9 +46,11 @@ var _ = Describe("Schema.Resolvers", func() {
 		Describe("CreateTodo", func() {
 			It("returns the created todo", func() {
 				input := model.NewTodo{Text: "Test Todo"}
-				expectedTodo := &model.Todo{ID: "todo123", Text: "Test Todo"}
+				id := "todo123"
+				expectedDbTodo := &dbtodo.Todo{Id: &id, Text: "Test Todo"}
+				expectedTodo := expectedDbTodo.ToGraphQL()
 
-				mockRepo.EXPECT().Create(ctx, usr, input).Return(expectedTodo, nil)
+				mockRepo.EXPECT().Create(ctx, usr, input).Return(expectedDbTodo, nil)
 
 				res, err := mutResolver.CreateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -69,9 +72,11 @@ var _ = Describe("Schema.Resolvers", func() {
 		Describe("UpdateTodo", func() {
 			It("returns the updated todo", func() {
 				input := model.UpdateTodo{ID: "todo123"}
-				expectedTodo := &model.Todo{ID: "todo123"}
+				id := "todo123"
+				expectedDbTodo := &dbtodo.Todo{Id: &id}
+				expectedTodo := expectedDbTodo.ToGraphQL()
 
-				mockRepo.EXPECT().Update(ctx, input).Return(expectedTodo, nil)
+				mockRepo.EXPECT().Update(ctx, input).Return(expectedDbTodo, nil)
 
 				res, err := mutResolver.UpdateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -100,12 +105,18 @@ var _ = Describe("Schema.Resolvers", func() {
 
 		Describe("Todos", func() {
 			It("returns a list of todos", func() {
+				id1 := "todo1"
+				id2 := "todo2"
+				expectedDbTodos := []dbtodo.Todo{
+					{Id: &id1},
+					{Id: &id2},
+				}
 				expectedTodos := []*model.Todo{
-					{ID: "todo1"},
-					{ID: "todo2"},
+					expectedDbTodos[0].ToGraphQL(),
+					expectedDbTodos[1].ToGraphQL(),
 				}
 
-				mockRepo.EXPECT().List(ctx).Return(expectedTodos, nil)
+				mockRepo.EXPECT().List(ctx).Return(expectedDbTodos, nil)
 
 				res, err := queryResolver.Todos(ctx)
 				Expect(err).NotTo(HaveOccurred())

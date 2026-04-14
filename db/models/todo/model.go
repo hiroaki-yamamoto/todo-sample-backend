@@ -45,6 +45,5 @@ func (me *Todo) ToGraphQL() *graph.Todo {
 		Text:        me.Text,
 		WipAt:       wipAt,
 		CompletedAt: completedAt,
-		User:        me.User.ToGraphQL(),
 	}
 }

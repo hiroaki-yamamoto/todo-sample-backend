@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	todo "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/todo"
 	user "github.com/hiroaki-yamamoto/todo-sample-backend/db/models/user"
 	model "github.com/hiroaki-yamamoto/todo-sample-backend/graph/model"
 	gomock "go.uber.org/mock/gomock"
@@ -43,10 +44,10 @@ func (m *MockIList) EXPECT() *MockIListMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockIList) List(ctx context.Context) ([]*model.Todo, error) {
+func (m *MockIList) List(ctx context.Context) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx)
-	ret0, _ := ret[0].([]*model.Todo)
+	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -82,10 +83,10 @@ func (m *MockICreate) EXPECT() *MockICreateMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockICreate) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
+func (m *MockICreate) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -121,10 +122,10 @@ func (m *MockIUpdate) EXPECT() *MockIUpdateMockRecorder {
 }
 
 // Update mocks base method.
-func (m *MockIUpdate) Update(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
+func (m *MockIUpdate) Update(ctx context.Context, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -160,10 +161,10 @@ func (m *MockITodoRepo) EXPECT() *MockITodoRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockITodoRepo) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*model.Todo, error) {
+func (m *MockITodoRepo) Create(ctx context.Context, arg1 user.User, input model.NewTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, arg1, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -175,10 +176,10 @@ func (mr *MockITodoRepoMockRecorder) Create(ctx, arg1, input any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockITodoRepo) List(ctx context.Context) ([]*model.Todo, error) {
+func (m *MockITodoRepo) List(ctx context.Context) ([]todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx)
-	ret0, _ := ret[0].([]*model.Todo)
+	ret0, _ := ret[0].([]todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -190,10 +191,10 @@ func (mr *MockITodoRepoMockRecorder) List(ctx any) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockITodoRepo) Update(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
+func (m *MockITodoRepo) Update(ctx context.Context, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, input)
-	ret0, _ := ret[0].(*model.Todo)
+	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

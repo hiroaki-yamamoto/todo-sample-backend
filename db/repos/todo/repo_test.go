@@ -54,7 +54,7 @@ var _ = Describe("Repo", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).NotTo(BeNil())
 			Expect(result.Text).To(Equal("My new task"))
-			Expect(result.User.ID).To(Equal(*u.Id))
+			Expect(*result.UserId).To(Equal(*u.Id))
 			Expect(result.WipAt).To(BeNil())
 			Expect(result.CompletedAt).To(BeNil())
 
@@ -99,7 +99,7 @@ var _ = Describe("Repo", func() {
 			texts := []string{results[0].Text, results[1].Text}
 			Expect(texts).To(ContainElement("Task 1"))
 			Expect(texts).To(ContainElement("Task 2"))
-			Expect(results[0].User.ID).To(Equal(*u.Id))
+			Expect(*results[0].UserId).To(Equal(*u.Id))
 		})
 	})
 
@@ -147,8 +147,8 @@ var _ = Describe("Repo", func() {
 			result, err := repo.Update(ctx, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Text).To(Equal("Status Updated"))
-			Expect(*result.WipAt).To(Equal(wipStr))
-			Expect(*result.CompletedAt).To(Equal(compStr))
+			Expect((*result.WipAt).Unix()).To(Equal(wipTime.Unix()))
+			Expect((*result.CompletedAt).Unix()).To(Equal(completedTime.Unix()))
 
 			var dbTodo dbtodo.Todo
 			db.First(&dbTodo, "id = ?", *t.Id)

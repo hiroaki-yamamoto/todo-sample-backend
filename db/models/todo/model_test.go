@@ -38,9 +38,6 @@ var _ = Describe("Model", func() {
 			Expect(res.Text).To(Equal("Sample Todo"))
 			Expect(res.WipAt).To(BeNil())
 			Expect(res.CompletedAt).To(BeNil())
-			Expect(res.User).NotTo(BeNil())
-			Expect(res.User.ID).To(Equal(uid))
-			Expect(res.User.Name).To(Equal("testuser"))
 		})
 
 		Context("with non-nil dates", func() {
