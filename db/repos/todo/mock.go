@@ -122,18 +122,18 @@ func (m *MockIUpdate) EXPECT() *MockIUpdateMockRecorder {
 }
 
 // Update mocks base method.
-func (m *MockIUpdate) Update(ctx context.Context, input model.UpdateTodo) (*todo.Todo, error) {
+func (m *MockIUpdate) Update(ctx context.Context, arg1 user.User, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, input)
+	ret := m.ctrl.Call(m, "Update", ctx, arg1, input)
 	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockIUpdateMockRecorder) Update(ctx, input any) *gomock.Call {
+func (mr *MockIUpdateMockRecorder) Update(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIUpdate)(nil).Update), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIUpdate)(nil).Update), ctx, arg1, input)
 }
 
 // MockITodoRepo is a mock of ITodoRepo interface.
@@ -191,16 +191,16 @@ func (mr *MockITodoRepoMockRecorder) List(ctx, arg1 any) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockITodoRepo) Update(ctx context.Context, input model.UpdateTodo) (*todo.Todo, error) {
+func (m *MockITodoRepo) Update(ctx context.Context, arg1 user.User, input model.UpdateTodo) (*todo.Todo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, input)
+	ret := m.ctrl.Call(m, "Update", ctx, arg1, input)
 	ret0, _ := ret[0].(*todo.Todo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockITodoRepoMockRecorder) Update(ctx, input any) *gomock.Call {
+func (mr *MockITodoRepoMockRecorder) Update(ctx, arg1, input any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockITodoRepo)(nil).Update), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockITodoRepo)(nil).Update), ctx, arg1, input)
 }

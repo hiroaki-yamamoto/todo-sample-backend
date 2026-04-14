@@ -122,7 +122,7 @@ var _ = Describe("Repo", func() {
 				ID:   *t.Id,
 				Text: "Updated Task",
 			}
-			result, err := repo.Update(ctx, input)
+			result, err := repo.Update(ctx, u, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).NotTo(BeNil())
 			Expect(result.Text).To(Equal("Updated Task"))
@@ -144,7 +144,7 @@ var _ = Describe("Repo", func() {
 				WipAt:       &wipStr,
 				CompletedAt: &compStr,
 			}
-			result, err := repo.Update(ctx, input)
+			result, err := repo.Update(ctx, u, input)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Text).To(Equal("Status Updated"))
 			Expect((*result.WipAt).Unix()).To(Equal(wipTime.Unix()))
@@ -161,7 +161,7 @@ var _ = Describe("Repo", func() {
 				ID:   "00000000-0000-0000-0000-000000000000",
 				Text: "Ghost Task",
 			}
-			_, err := repo.Update(ctx, input)
+			_, err := repo.Update(ctx, u, input)
 			Expect(err).To(HaveOccurred())
 		})
 	})

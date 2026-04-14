@@ -34,9 +34,13 @@ func (r *TodoRepo) Create(ctx context.Context, user user.User, input gqlModel.Ne
 	return &t, nil
 }
 
-func (r *TodoRepo) Update(ctx context.Context, input gqlModel.UpdateTodo) (*dbtodo.Todo, error) {
+func (r *TodoRepo) Update(
+	ctx context.Context,
+	user user.User,
+	input gqlModel.UpdateTodo,
+) (*dbtodo.Todo, error) {
 	var t dbtodo.Todo
-	if err := r.DB.WithContext(ctx).Preload("User").First(&t, "id = ?", input.ID).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&t, "id = ? AND user_id = ?", input.ID, user.Id).Error; err != nil {
 		return nil, err
 	}
 	t.Text = input.Text

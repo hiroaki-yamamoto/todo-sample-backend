@@ -34,7 +34,16 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
-	todo, err := r.todoRepo.Update(ctx, input)
+	v := gauthMw.GetUser(ctx)
+	if v == nil {
+		return nil, errors.New("unauthenticated")
+	}
+	u, ok := v.(*user.User)
+	if !ok {
+		return nil, errors.New("invalid user context")
+	}
+
+	todo, err := r.todoRepo.Update(ctx, *u, input)
 	if err != nil {
 		return nil, err
 	}

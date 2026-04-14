@@ -81,7 +81,7 @@ var _ = Describe("Schema.Resolvers", func() {
 				expectedDbTodo := &dbtodo.Todo{Id: &id}
 				expectedTodo := expectedDbTodo.ToGraphQL()
 
-				mockRepo.EXPECT().Update(ctx, input).Return(expectedDbTodo, nil)
+				mockRepo.EXPECT().Update(ctx, usr, input).Return(expectedDbTodo, nil)
 
 				res, err := mutResolver.UpdateTodo(ctx, input)
 				Expect(err).NotTo(HaveOccurred())
@@ -92,7 +92,7 @@ var _ = Describe("Schema.Resolvers", func() {
 				input := model.UpdateTodo{ID: "todo123"}
 				expectedErr := errors.New("update failed")
 
-				mockRepo.EXPECT().Update(ctx, input).Return(nil, expectedErr)
+				mockRepo.EXPECT().Update(ctx, usr, input).Return(nil, expectedErr)
 
 				res, err := mutResolver.UpdateTodo(ctx, input)
 				Expect(err).To(MatchError(expectedErr))

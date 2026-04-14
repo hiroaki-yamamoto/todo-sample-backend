@@ -17,7 +17,7 @@ type ICreate interface {
 }
 
 type IUpdate interface {
-	Update(ctx context.Context, input gqlModel.UpdateTodo) (*model.Todo, error)
+	Update(ctx context.Context, user user.User, input gqlModel.UpdateTodo) (*model.Todo, error)
 }
 
 type ITodoRepo interface {
